@@ -5,20 +5,11 @@ function [Q,bet1,alp1,rho1,FDR,itr] = EM_nodal_bu(A,alp1,bet1,rho1)
 % The input should be a 3D matrix, subject's adj matrix stacked at the
 % top of each others. 
 %
-% SA, Ox, 2018
-%
-
-%clear
-%Sim me some nets
-% N = 114;
-% M = 5;
-% T = 1200; 
-% for i = 1:M    
-%     A_tmp = binornd(1,0.2,[N N]);
-%     A_tmp = triu(A_tmp,1)+triu(A_tmp,1)';
-%     A_tmp(1:N+1:end) = 1;
-%     A(:,:,i) = A_tmp;
-% end
+%_________________________________________________________________________
+% Soroosh Afyouni, University of Oxford, 2018
+% srafyouni@gmail.com
+fnnf=mfilename; if ~nargin; help(fnnf); return; end; clear fnnf;
+%_________________________________________________________________________
 
     N = size(A,1);
     M = size(A,3);
