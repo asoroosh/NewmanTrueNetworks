@@ -15,6 +15,8 @@ bias = @(E1,E0) ((E1-E0)./E0.*100);
 %end
 addpath(genpath('/Users/sorooshafyouni/Home/GitClone/DVARS'))
 addpath(genpath('/Users/sorooshafyouni/Home/GitClone/xDF'))
+addpath(genpath('/Users/sorooshafyouni/Home/GitClone/NewmanTrueNetworks'))
+addpath(genpath('/Users/sorooshafyouni/Home/matlab/Ext/BCT/2017_01_15_BCT'))
 
 load('/Users/sorooshafyouni/Home/BCF/BCFAnal/FC/S/HCP_100Unrel_SubList.mat')
 SubList = HCP_10Unrel_SubList;
@@ -25,7 +27,7 @@ for i = 1:nsub
     load(['/Users/sorooshafyouni/Home/BCF/BCFAnal/FC/100HCPTimeSeries/Yeo/HCP_FPP_' SubList{i} '_OnlyMTS.mat'])
     %load(['/Users/sorooshafyouni/Home/BCF/BCFAnal/FC/ICA200/FPP/HCP_FPP_' SubList{i} '_OnlyMTS.mat'])
     
-    mts = GSRme(mts,T);
+%     mts = GSRme(mts,T);
     
 %     [~,Stat] = xDF(mts',T);
 %     mat_tmp = Stat.z.rzf;
@@ -46,9 +48,11 @@ for i = 1:nsub
     mat_tmp(1:N+1:end) = 0;
     A(:,:,i) = mat_tmp;
     
+    Naive_dgr(:,i) = degrees_und(mat_tmp);
+    
     clear mat_tmp;
     
-    [~,Stat] = xDF(mts',T,'truncate','adaptive');
+    [~,Stat] = xDF(mts',T,'truncate','adaptive','TVOff');
     mat_tmp = Stat.z;
     mat_tmp(mat_tmp<0) = 0;
     mat_tmp = z2p_fdr(mat_tmp);
@@ -57,14 +61,15 @@ for i = 1:nsub
     mat_tmp(1:N+1:end) = 0;
     Axdf(:,:,i) = mat_tmp;
     
+    xDF_dgr(:,i) = degrees_und(mat_tmp);
+    
     
 %     [~,mat_tmp] = CRBCF(mts',T);
 %     mat_tmp(mat_tmp<0) = 0;
 %     mat_tmp = z2p_fdr(mat_tmp);
-%     mat_tmp(mat_tmp>0) = 1; 
-    
-    mat_tmp(1:N+1:end) = 0;
-    Acr(:,:,i) = mat_tmp;
+%     mat_tmp(mat_tmp>0) = 1;   
+%     mat_tmp(1:N+1:end) = 0;
+%     Acr(:,:,i) = mat_tmp;
 end
 
 disp(['Alpha-beta on Corr z-scores'])
@@ -77,21 +82,22 @@ disp(['Alpha-beta on xDF z-scores'])
 % disp(['Alpha-beta on xDF z-scores'])
 % [Q_cr_nodal,bet1_cr_nodal,alp1_cr_nodal,rho1_cr_nodal,FDR_cr_nodal,itr_cr_nodal] = EM_nodal_bu(Acr);
 
+%%%
+xDFd = mean(xDF_dgr,2);
+Nd = mean(Naive_dgr,2);
+[r,p] = corr(alp1_xdf_nodal',xDFd)
+
 figure; 
 subplot(2,1,1)
 hold on;
-g = bar([bias(bet1_xdf_nodal,bet1_nodal)]');
-%g(1).FaceColor = 'r';
-%g(2).FaceColor = 'b';
+g = bar([bias(bet1_xdf_nodal,bet1_nodal)]);
 title('FPR')
 legend('xDF','BH')
 ylim([-50 50])
 
 subplot(2,1,2)
 hold on;
-g = bar([bias(alp1_xdf_nodal,alp1_nodal);bias(alp1_cr_nodal,alp1_nodal)]');
-%g(1).FaceColor = 'r';
-%g(2).FaceColor = 'b';
+g = bar([bias(alp1_xdf_nodal,alp1_nodal)]);
 title('TPR')
 xlabel('Nodes')
 legend('xDF','BH')
@@ -100,22 +106,34 @@ ylim([-50 50])
 %=====================================
 
 figure; 
-subplot(2,1,1)
+subplot(3,1,1)
 hold on;
 g = bar([bet1_nodal;bet1_xdf_nodal]');
 g(1).FaceColor = 'r';
 g(2).FaceColor = 'b';
 title('FPR')
-legend('Naive','xDF','BH')
+legend('Naive','xDF')
+ylim([0 1])
 
-subplot(2,1,2)
+subplot(3,1,2)
 hold on;
-g = bar([alp1_nodal;alp1_xdf_nodal;alp1_cr_nodal]');
+g = bar([alp1_nodal;alp1_xdf_nodal]');
 g(1).FaceColor = 'r';
 g(2).FaceColor = 'b';
 title('TPR')
 xlabel('Nodes')
-legend('Naive','xDF','BH')
+legend('Naive','xDF')
+ylim([0 1])
+
+subplot(3,1,3)
+hold on;
+g = bar([alp1_nodal-alp1_xdf_nodal; bet1_nodal-bet1_xdf_nodal]');
+g(1).FaceColor = 'r';
+g(2).FaceColor = 'b';
+title('TPR')
+xlabel('Nodes')
+legend('Difference In TPR','Difference in FPR')
+
 
 
 

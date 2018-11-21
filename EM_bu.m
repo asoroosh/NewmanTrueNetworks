@@ -5,6 +5,9 @@ function [Q,cr,bet1,alp1,rho1,itr] = EM_bu(A)
 % The input should be a 3D matrix, subject's adj matrix stacked at the
 % top of each others. 
 %
+%%%REFERENCE
+% Newman, M. E. J. "Network structure from rich but noisy data." 
+% Nature Physics 14.6 (2018): 542.
 %_________________________________________________________________________
 % Soroosh Afyouni, University of Oxford, 2018
 % srafyouni@gmail.com
