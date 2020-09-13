@@ -92,6 +92,7 @@ subplot(2,1,1)
 hold on;
 g = bar([bias(bet1_xdf_nodal,bet1_nodal)]);
 title('FPR')
+ylabel('Bias %')
 legend('xDF','BH')
 ylim([-50 50])
 
@@ -99,6 +100,7 @@ subplot(2,1,2)
 hold on;
 g = bar([bias(alp1_xdf_nodal,alp1_nodal)]);
 title('TPR')
+ylabel('Bias %')
 xlabel('Nodes')
 legend('xDF','BH')
 ylim([-50 50])
